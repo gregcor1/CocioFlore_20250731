@@ -1,101 +1,93 @@
 <?php
 
 $host_aceptados = array('localhost','127.0.0.1');
-$metodo_aceptdo = 'POST';
+$metodo_aceptado = 'POST';
 $usuario_correcto = "Admin";
-$pasword_correcto = "Admin";
-
+$password_correcto = "Admin";
 $txt_usuario = $_POST["txt_usuario"];
 $txt_password = $_POST["txt_password"];
-
 $token = "";
 
-
-if( in_array($_SERVER["HTTP_HOST"], $host_aceptados)){
-    	
-    if($_SERVER["REQUEST_METHOD"] == $host_aceptados){
-
-            if(isset($txt_usuario) && !empty($txt_usuario)){
-
-
-                if(isset($txt_password) && !empty($txt_password)){
-
-                    if($txt_usuario==$usuario_correcto){
-
-                        if($txt_password==$password_correcto){
-
-                            $ruta = "Welcome.php";
-                            $msg = "";
-                            $codigo_estado = 200;
-                            $texto_estado = "ok";
-                            list($usec,$sec) = explode('',microtime());
-                            $token = base64_encode(date("Y-m-d H:i:s" , $sec).substr($usec,1));
+if(in_array($_SERVER["HTTP_HOST"], $host_aceptados) ){
+ //La direccion ip es aceptada
+  if($_SERVER["REQUEST_METHOD"] == $metodo_aceptado){
+    //se acepta el metodo usado por el usuario
+    if(isset($txt_usuario) && !empty($txt_usuario)){
+        //Si se enviaron valores en el campo usuario.
+        if(isset($txt_password) && !empty($txt_password)){
+            //Si se envio el valor de la contraseña
+                if($txt_usuario==$usuario_correcto){
+                    //El valor ingresado del campo usuario es correcto
+                    if($txt_password==$password_correcto){
+                        //El valor ingresado del campo password es correcto
+                        $ruta = "welcome.php";
+                        $msg = "";
+                        $codigo_estado = 200;
+                        $texto_estado = "Ok";
+                        list($usec,$sex) = explode(' ', microtime());
+                        $token = base64_encode(date("Y-m-d H:i:s",$sec).substr($usec,1));
                     }else{
+                         //El valor ingresado del campo password no es correcto
                         $ruta = "";
-                    $msg = "Contra Mala";
-                    $codigo_estado = 400;
-                    $texto_estado = "ok";
-                    $token = "";
+                        $msg = "Contra incorrecta";
+                        $codigo_estado = 400;
+                        $texto_estado = "Bad Request";
+                        $token = "";
                     }
-                    
                 }else{
-
+                   // //El valor ingresado del campo usuario no es correcto
                     $ruta = "";
-                    $msg = "No se roconoce l usuario";
+                    $msg = "Usuario Invalido";
                     $codigo_estado = 401;
-                    $texto_estado = "unauthorized";
+                    $texto_estado = "Unauthorized";
                     $token = "";
                 }
-            }else{
-
-                $ruta = "";
-                    $msg = "el campo del usurio esta vacio";
-                    $codigo_estado = 401;
-                    $texto_estado = "unauthorized";
-                    $token = "";
-            }
+        }else {
+            //El campo password esta vacio
+            $ruta = "";
+            $msg = "El campo contraseña esta vacio";
+            $codigo_estado = 401;
+            $texto_estado = "Unauthorized";
+            $token = "";
+        }
     }else{
-
+        //El campo usuario esta vacio
         $ruta = "";
-                    $msg = "el campo de la contra esta vacio";
-                    $codigo_estado = 405;
-                    $texto_estado = "method not allowed";
-                    $token = "";
+        $msg = "El campo usuario esta vacio";
+        $codigo_estado = 401;
+        $texto_estado = "Unauthorized";
+        $token = "";
     }
-
-
-
-}else{
-
+  }else{
+    //El metodo usado por el usuario no es aceptado
     $ruta = "";
-    $msg = "el campo sta vacio";
-    $codigo_estado = 401;
-    $texto_estado = "unauthorized";
+    $msg = "No e¿se acepta ese metodo";
+    $codigo_estado = 405;
+    $texto_estado = "Method Not Allowed";
     $token = "";
-
-}
+  }
 }else{
-
-    $ruta = "";
-                    $msg = "el campo sta vacio";
-                    $codigo_estado = 401;
-                    $texto_estado = "unauthorized";
-                    $token = "";
+//La direccion ip no es aceptada
+$ruta = "";
+$msg = "Ne acepta esa IP";
+$codigo_estado = 403;
+$texto_estado = "Forbidden";
+$token = "";
 }
 
-$arreglo_respuesta = array(
-    "status" => ((intval($codgo_estado) == 200 ) ? "ok": "Error"),
-    "Error" => ( (intvsl($codigo_estdo) == 200 ) ? "" : array("code"=> $codigo_estado, "Message"=>$msg));
-    "data" => array (
-        "url" => $ruta,
-        "token" =>$token 
-
-    );
-    "count" =>1
+$arreglo_respuesta  = array(
+    "status" => ( (intval($codigo_estado) == 200)? "Ok": "Error" ),
+    "error" => ( (intval($codigo_estado) == 200) ? "": array("code"=>$codigo_estado,"message"=>$msg) ),
+    "data" => array(
+        "url"=>$ruta,
+        "token"=>$token
+    ),
+    "count"=>1
 );
 
-header ("HTTP/1.1". $codigo_estado. " ". $texto_estado);
-header ("Conten-Type: Application/json");
-echo(json_encode)
+ header("HTTP/1.1 ".$codigo_estado." ".$texto_estado);
+ header("Content-Type: Aplication/json");
+ echo($arreglo_respuesta);
+
 
 ?>
